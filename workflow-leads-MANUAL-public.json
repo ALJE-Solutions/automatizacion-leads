@@ -1,0 +1,234 @@
+{
+  "name": "Leads - Buscar Negocios Sin Web",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "🔍 Buscar Negocios Sin Web",
+        "formDescription": "Introduce la ciudad y el tipo de negocio. Los leads sin web se guardarán en leads.csv",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Ciudad",
+              "placeholder": "Ej: Madrid, Sevilla, Barcelona...",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Nicho",
+              "placeholder": "Ej: peluquería, dentista, fontanero...",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "respondWithOptions": {
+            "values": {
+              "formSubmittedText": "✅ ¡Búsqueda completada! Revisa leads.csv en tu carpeta."
+            }
+          }
+        }
+      },
+      "id": "form-trigger",
+      "name": "📝 Formulario",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [0, 300],
+      "webhookId": "leads-buscar"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://serpapi.com/search.json",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "engine",
+              "value": "google_maps"
+            },
+            {
+              "name": "q",
+              "value": "={{ $json.Ciudad }} {{ $json.Nicho }}"
+            },
+            {
+              "name": "hl",
+              "value": "es"
+            },
+            {
+              "name": "type",
+              "value": "search"
+            },
+            {
+              "name": "api_key",
+              "value": "TU_API_KEY_DE_SERPAPI_AQUI"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "http-serpapi",
+      "name": "🔍 SerpApi",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [260, 300],
+      "onError": "continueRegularOutput",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "const response = $input.first().json;\nconst places = response.local_results || [];\nconst formData = $('📝 Formulario').first().json;\nconst ciudad = formData.Ciudad;\nconst nicho = formData.Nicho;\n\nif (response.error || places.length === 0) {\n  return [];\n}\n\nreturn places.map(place => ({\n  json: {\n    nombre: place.title || 'Sin nombre',\n    direccion: place.address || 'Sin dirección',\n    telefono: place.phone || 'No disponible',\n    rating: String(place.rating || 'Sin rating'),\n    num_reviews: place.reviews || 0,\n    website: place.website || '',\n    google_maps_url: place.gps_coordinates \n      ? 'https://www.google.com/maps?q=' + place.gps_coordinates.latitude + ',' + place.gps_coordinates.longitude\n      : (place.link || ''),\n    place_id: place.place_id || place.data_id || '',\n    ciudad: ciudad,\n    nicho: nicho,\n    fecha: new Date().toISOString().split('T')[0]\n  }\n}));"
+      },
+      "id": "code-extraer",
+      "name": "📊 Extraer Negocios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "sin-web",
+              "leftValue": "={{ $json.website }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty"
+              }
+            }
+          ],
+          "combinator": "or"
+        }
+      },
+      "id": "if-sin-web",
+      "name": "🔎 ¿Sin Web?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [780, 300]
+    },
+    {
+      "parameters": {
+        "operation": "csv",
+        "options": {}
+      },
+      "id": "convert-csv",
+      "name": "📄 Convertir a CSV",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [1040, 200]
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/ruta/a/tu/carpeta/leads.csv",
+        "options": {}
+      },
+      "id": "write-file",
+      "name": "💾 Guardar CSV",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [1300, 200]
+    },
+    {
+      "parameters": {},
+      "id": "noop-descartar",
+      "name": "❌ Tiene Web",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1040, 450]
+    }
+  ],
+  "connections": {
+    "📝 Formulario": {
+      "main": [
+        [
+          {
+            "node": "🔍 SerpApi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔍 SerpApi": {
+      "main": [
+        [
+          {
+            "node": "📊 Extraer Negocios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Extraer Negocios": {
+      "main": [
+        [
+          {
+            "node": "🔎 ¿Sin Web?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔎 ¿Sin Web?": {
+      "main": [
+        [
+          {
+            "node": "📄 Convertir a CSV",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "❌ Tiene Web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📄 Convertir a CSV": {
+      "main": [
+        [
+          {
+            "node": "💾 Guardar CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "local"
+  },
+  "tags": [
+    {
+      "name": "leads",
+      "id": "1"
+    }
+  ]
+}

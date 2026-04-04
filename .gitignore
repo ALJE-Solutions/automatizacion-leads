@@ -1,0 +1,20 @@
+# Archivos de datos generados
+leads.csv
+
+# Workflows obsoletos (solo subimos el MANUAL que es el funcional)
+workflow-leads.json
+workflow-leads-GRATIS.json
+workflow-leads-CSV.json
+
+# Workflow con datos privados (API key, rutas locales)
+workflow-leads-MANUAL.json
+
+# Guías obsoletas
+guia-completa.md
+guia-GRATUITA.md
+como-obtener-client-id-google.md
+
+# Sistema
+.DS_Store
+*.log
+node_modules/
