@@ -322,47 +322,45 @@
     },
     {
       "parameters": {
-        "resource": "contact",
-        "operation": "create",
-        "email": "={{ $json.email_contacto }}",
-        "additionalFields": {
-          "firstName": "={{ $json.nombre_contacto.split(' ')[0] }}",
-          "lastName": "={{ $json.nombre_contacto.split(' ').slice(1).join(' ') || '-' }}",
-          "company": "={{ $json.nombre_empresa }}",
-          "phone": "={{ $json.telefono || '' }}"
-        }
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZA_CON_TU_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "CRM",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ new Date().toISOString().split('T')[0] }}",
+            "empresa": "={{ $json.nombre_empresa }}",
+            "contacto": "={{ $json.nombre_contacto }}",
+            "email": "={{ $json.email_contacto }}",
+            "telefono": "={{ $json.telefono || '' }}",
+            "servicio": "={{ $json.servicio_label }}",
+            "asunto_enviado": "={{ $json.asunto_email }}",
+            "estado": "Email enviado",
+            "notas": ""
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
       },
-      "id": "node-hs-contact",
-      "name": "👤 Crear Contacto HubSpot",
-      "type": "n8n-nodes-base.hubspot",
-      "typeVersion": 2.1,
+      "id": "node-crm-sheet",
+      "name": "� Registrar en CRM",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
       "position": [1360, 300],
       "credentials": {
-        "hubspotAppToken": {
-          "id": "CONFIGURA_TU_CREDENCIAL_HUBSPOT",
-          "name": "HubSpot"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "deal",
-        "operation": "create",
-        "dealName": "={{ $json.servicio_label + ' — ' + $json.nombre_empresa }}",
-        "additionalFields": {
-          "dealStage": "appointmentscheduled",
-          "closeDate": "={{ new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0] }}"
-        }
-      },
-      "id": "node-hs-deal",
-      "name": "💼 Crear Trato HubSpot",
-      "type": "n8n-nodes-base.hubspot",
-      "typeVersion": 2.1,
-      "position": [1620, 300],
-      "credentials": {
-        "hubspotAppToken": {
-          "id": "CONFIGURA_TU_CREDENCIAL_HUBSPOT",
-          "name": "HubSpot"
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURA_TU_CREDENCIAL_GOOGLE",
+          "name": "Google Sheets"
         }
       }
     },
@@ -445,15 +443,10 @@
     },
     "📧 Enviar Email": {
       "main": [
-        [{ "node": "👤 Crear Contacto HubSpot", "type": "main", "index": 0 }]
+        [{ "node": "� Registrar en CRM", "type": "main", "index": 0 }]
       ]
     },
-    "👤 Crear Contacto HubSpot": {
-      "main": [
-        [{ "node": "💼 Crear Trato HubSpot", "type": "main", "index": 0 }]
-      ]
-    },
-    "💼 Crear Trato HubSpot": {
+    "� Registrar en CRM": {
       "main": [
         [{ "node": "✅ Marcar Procesado", "type": "main", "index": 0 }]
       ]

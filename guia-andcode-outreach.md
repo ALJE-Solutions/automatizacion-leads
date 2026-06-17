@@ -58,9 +58,8 @@
 | 6 | 📱 Variables App | Genera contenido para leads de Software a Medida |
 | 7 | 🤖 Variables Automatización | Genera contenido para leads de Automatización e IA |
 | 8 | 📧 Enviar Email | Manda el email HTML usando las variables del paso anterior |
-| 9 | 👤 Crear Contacto HubSpot | Registra el contacto en el CRM gratuito |
-| 10 | 💼 Crear Trato HubSpot | Crea el deal con etiqueta de servicio |
-| 11 | ✅ Marcar Procesado | Actualiza `email_enviado = SI` y `fecha_envio` en el Sheet |
+| 9 | � Registrar en CRM | Añade una fila en la pestaña "CRM" del Google Sheets |
+| 10 | ✅ Marcar Procesado | Actualiza `email_enviado = SI` y `fecha_envio` en la pestaña "Leads" |
 
 ---
 
@@ -71,10 +70,8 @@
 | **n8n** | Self-hosted | Gratis | Ya instalado |
 | **Google Sheets** | Cualquier cuenta Google | Gratis | [sheets.google.com](https://sheets.google.com) |
 | **Gmail** | Cuenta Google | Gratis | [gmail.com](https://gmail.com) |
-| **HubSpot** | Free CRM | Gratis | [hubspot.com](https://hubspot.com) |
 
-> ⚠️ **Google Sheets y Gmail requieren configurar OAuth en Google Cloud Console.**  
-> Si no quieres hacerlo, ve a la [alternativa SMTP](#alternativa-smtp-sin-google-cloud) al final de esta sección.
+> ✅ **No necesitas HubSpot ni ningún CRM externo.** El seguimiento de contactados se guarda en una segunda pestaña del mismo Google Sheets.
 
 ### Alternativa SMTP (sin Google Cloud)
 
@@ -201,36 +198,25 @@ En la pantalla **"ID de cliente para Aplicación web"** que tienes abierta:
 
 ---
 
-## Paso 3: Configurar HubSpot
+> ⚠️ **Google Sheets y Gmail requieren configurar OAuth en Google Cloud Console.**  
+> Si no quieres hacerlo, ve a la [alternativa SMTP](#alternativa-smtp-sin-google-cloud) al final de esta sección.
 
-### 3.1 Crear cuenta gratuita
+## Paso 3: Preparar la pestaña CRM en Google Sheets
 
-1. Ve a [hubspot.com](https://hubspot.com) → **"Empezar gratis"**
-2. Crea la cuenta con el email de AndCode
-3. El **CRM gratuito** incluye:
-   - Contactos ilimitados
-   - Tratos (deals)
-   - Pipeline de ventas
+No necesitas ninguna app externa. El workflow guarda los contactados en una segunda pestaña llamada **"CRM"** dentro del mismo Sheets.
 
-### 3.2 Crear un Private App Token
+1. Abre tu Google Sheets
+2. Abajo del todo, haz clic en **`+`** para añadir una pestaña nueva
+3. Nómbrala exactamente **`CRM`**
+4. En la **primera fila**, añade estas columnas:
 
-1. En HubSpot: **⚙️ Configuración → Integraciones → Aplicaciones privadas**
-2. **Crear aplicación privada**
-3. Nombre: `n8n-andcode`
-4. En la pestaña **Scopes**, activa:
-   - `crm.objects.contacts.write`
-   - `crm.objects.deals.write`
-   - `crm.objects.contacts.read`
-5. **Crear aplicación** → Copia el token (`pat-...`)
-6. En n8n: **Credenciales → Nueva → HubSpot App Token**
-7. Pega el token
+| A | B | C | D | E | F | G | H | I |
+|---|---|---|---|---|---|---|---|---|
+| `fecha` | `empresa` | `contacto` | `email` | `telefono` | `servicio` | `asunto_enviado` | `estado` | `notas` |
 
-### 3.3 Configurar el Pipeline en HubSpot
+> El workflow rellenará automáticamente todas las columnas excepto `notas`, que puedes usar para añadir comentarios a mano después.
 
-El workflow crea tratos en la etapa `appointmentscheduled` (primera etapa por defecto). Para cambiarla:
-1. En HubSpot: **CRM → Negocios → ⚙️ Editar etapas**
-2. Copia el nombre interno de la etapa que prefieras
-3. En n8n, en el nodo **💼 Crear Trato HubSpot**, cambia `dealStage` por ese valor
+La pestaña **"Leads"** sigue siendo donde añades los prospectos. La pestaña **"CRM"** es donde el workflow registra a los que ya han recibido el email.
 
 ---
 
@@ -258,16 +244,16 @@ Para cada nodo con ⚠️ (error de credenciales), haz doble clic y configura:
 |------|---------------------|
 | 📋 Leer Leads | Google Sheets OAuth2 |
 | 📧 Enviar Email | Gmail OAuth2 (o SMTP) |
-| 👤 Crear Contacto HubSpot | HubSpot App Token |
-| 💼 Crear Trato HubSpot | HubSpot App Token |
+| � Registrar en CRM | Google Sheets OAuth2 |
 | ✅ Marcar Procesado | Google Sheets OAuth2 |
 
 ### 4.4 Configurar el ID del Google Sheets
 
-Hay **dos nodos** que necesitan el ID de tu Sheet:
+Hay **tres nodos** que necesitan el ID de tu Sheet:
 
 1. **Nodo 📋 Leer Leads** → campo `Document ID` → pega el ID
-2. **Nodo ✅ Marcar Procesado** → campo `Document ID` → pega el mismo ID
+2. **Nodo 📊 Registrar en CRM** → campo `Document ID` → pega el mismo ID
+3. **Nodo ✅ Marcar Procesado** → campo `Document ID` → pega el mismo ID
 
 ### 4.5 Verificar el nombre de la hoja
 
@@ -299,8 +285,8 @@ Deja siempre `email_enviado` en blanco (el workflow lo rellena automáticamente)
 
 Tras la ejecución:
 - ✅ Los emails aparecen en la carpeta **Enviados** de tu Gmail
-- ✅ En HubSpot verás los contactos y tratos nuevos
-- ✅ En el Sheet, las filas procesadas tendrán `SI` en `email_enviado`
+- ✅ En la pestaña **CRM** del Sheet verás una fila nueva por cada lead contactado
+- ✅ En la pestaña **Leads**, las filas procesadas tendrán `SI` en `email_enviado`
 
 ---
 
@@ -396,8 +382,7 @@ Esto pasa porque tu app está en modo **"En prueba"** y tu email no está en la 
 - Si usas SMTP, verifica que la App Password es correcta
 
 ### ❌ "Contacto ya existe en HubSpot"
-- HubSpot no permite duplicar emails — si el contacto ya existe, el nodo fallará
-- Solución: activa `Continue on Fail` en el nodo 👤 Crear Contacto HubSpot
+- Este error ya no aplica — HubSpot ha sido eliminado del workflow.
 
 ### ❌ El Switch no enruta correctamente
 - Verifica que `servicio_objetivo` en el Sheet está escrito exactamente: `web`, `app` o `automatizacion` (sin tildes, en minúsculas)
