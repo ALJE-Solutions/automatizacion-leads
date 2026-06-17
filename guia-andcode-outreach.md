@@ -144,6 +144,19 @@ Copia ese ID — lo necesitarás en el workflow.
 8. En n8n: **Credenciales → Nueva → Gmail OAuth2**
 9. Introduce Client ID y Client Secret → Conectar con Google
 
+> ⚠️ **Error 403: access_denied — "Outreach no ha completado la verificación de Google"**
+>
+> Esto ocurre porque tu app OAuth está en modo **"Testing"** y Google solo permite que accedan los usuarios que hayas añadido manualmente como testers. Es completamente normal en apps de uso interno.
+>
+> **Solución (30 segundos):**
+> 1. Ve a [console.cloud.google.com](https://console.cloud.google.com) → **APIs y servicios → Pantalla de consentimiento de OAuth**
+> 2. Baja hasta la sección **"Usuarios de prueba"**
+> 3. Haz clic en **"+ Add Users"**
+> 4. Escribe `andcodeinfo@gmail.com` (o el email con el que intentas conectar)
+> 5. Guarda → vuelve a n8n e intenta conectar de nuevo
+>
+> No hace falta publicar ni verificar la app — para uso interno en modo Testing es suficiente.
+
 ### Opción B: SMTP con App Password (más rápido)
 
 1. En tu cuenta Google: [myaccount.google.com/security](https://myaccount.google.com/security)
@@ -330,6 +343,17 @@ Estas son las fórmulas n8n que hacen el email personalizado:
 - Verifica que el `Document ID` es correcto (la parte larga de la URL)
 - Asegúrate de que la hoja se llama exactamente `Leads`
 - Confirma que la credencial de Google Sheets está conectada
+
+### ❌ Error 403: access_denied — "Outreach no ha completado la verificación de Google"
+
+Tu app OAuth está en modo Testing. Google bloquea el acceso a cualquier email que no esté en la lista de testers.
+
+**Solución:**
+1. Ve a [console.cloud.google.com](https://console.cloud.google.com)
+2. **APIs y servicios → Pantalla de consentimiento de OAuth**
+3. Sección **"Usuarios de prueba"** → **"+ Add Users"**
+4. Añade el email con el que intentas conectar (ej: `andcodeinfo@gmail.com`)
+5. Guarda → vuelve a n8n y reconecta la credencial
 
 ### ❌ "Error de autenticación Gmail"
 - La credencial OAuth ha caducado → reconecta desde n8n → Credenciales

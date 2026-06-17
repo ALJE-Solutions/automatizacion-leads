@@ -11,7 +11,8 @@
     },
     {
       "parameters": {
-        "operation": "readAllRows",
+        "resource": "sheet",
+        "operation": "read",
         "documentId": {
           "__rl": true,
           "value": "REEMPLAZA_CON_TU_SHEETS_ID",
@@ -22,12 +23,13 @@
           "value": "Leads",
           "mode": "name"
         },
+        "filtersUI": {},
         "options": {}
       },
       "id": "node-gs-read",
       "name": "📋 Leer Leads",
       "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.2,
+      "typeVersion": 4.7,
       "position": [0, 300],
       "credentials": {
         "googleSheetsOAuth2Api": {
@@ -366,7 +368,8 @@
     },
     {
       "parameters": {
-        "operation": "update",
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
         "documentId": {
           "__rl": true,
           "value": "REEMPLAZA_CON_TU_SHEETS_ID",
@@ -391,7 +394,7 @@
       "id": "node-gs-update",
       "name": "✅ Marcar Procesado",
       "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.2,
+      "typeVersion": 4.7,
       "position": [1880, 300],
       "credentials": {
         "googleSheetsOAuth2Api": {
