@@ -1,0 +1,472 @@
+{
+  "name": "AndCode - Outreach Multi-Servicio",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "node-manual",
+      "name": "🕐 Ejecutar Manualmente",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "readAllRows",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZA_CON_TU_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "id": "node-gs-read",
+      "name": "📋 Leer Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [0, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURA_TU_CREDENCIAL_GOOGLE",
+          "name": "Google Sheets"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "cond-not-sent",
+              "leftValue": "={{ $json.email_enviado }}",
+              "rightValue": "SI",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "id": "node-filter",
+      "name": "🔎 Filtrar No Procesados",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [260, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.servicio_objetivo.toLowerCase().trim() }}",
+                    "rightValue": "web",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Web"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.servicio_objetivo.toLowerCase().trim() }}",
+                    "rightValue": "app",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "App"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose"
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.servicio_objetivo.toLowerCase().trim() }}",
+                    "rightValue": "automatizacion",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Automatización"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "node-switch",
+      "name": "🔀 Switch Servicio",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [520, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "w-asunto",
+              "name": "asunto_email",
+              "value": "={{ '¿Tu web está perdiendo clientes sin que lo sepas, ' + $json.nombre_contacto + '?' }}",
+              "type": "string"
+            },
+            {
+              "id": "w-problema",
+              "name": "problema",
+              "value": "={{ 'Muchas empresas como ' + $json.nombre_empresa + ' operan con una web desactualizada o directamente sin presencia online, perdiendo entre un 30 y 50% de sus clientes potenciales antes de que lleguen a contactarles.' }}",
+              "type": "string"
+            },
+            {
+              "id": "w-propuesta",
+              "name": "propuesta",
+              "value": "En AndCode llevamos más de 50 empresas al entorno digital con webs corporativas modernas, rápidas y diseñadas para convertir visitas en consultas reales. Trabajamos con tecnologías como React, Next.js y WordPress, adaptándonos siempre a las necesidades y presupuesto de cada cliente.",
+              "type": "string"
+            },
+            {
+              "id": "w-cta",
+              "name": "cta",
+              "value": "¿Tienes 15 minutos esta semana para una auditoría gratuita de tu presencia online? Me encantaría darte feedback concreto y sin compromiso.",
+              "type": "string"
+            },
+            {
+              "id": "w-label",
+              "name": "servicio_label",
+              "value": "Desarrollo Web",
+              "type": "string"
+            },
+            {
+              "id": "w-tag",
+              "name": "hubspot_servicio",
+              "value": "WEB",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-set-web",
+      "name": "🌐 Variables Web",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 80]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a-asunto",
+              "name": "asunto_email",
+              "value": "={{ '¿Cuántas horas pierde ' + $json.nombre_empresa + ' al mes en procesos manuales?' }}",
+              "type": "string"
+            },
+            {
+              "id": "a-problema",
+              "name": "problema",
+              "value": "={{ 'La mayoría de empresas gestionan procesos críticos con hojas de cálculo y herramientas desconectadas entre sí. Esto genera errores, retrabajos y frustración en los equipos. ' + $json.nombre_empresa + ' probablemente tampoco es una excepción.' }}",
+              "type": "string"
+            },
+            {
+              "id": "a-propuesta",
+              "name": "propuesta",
+              "value": "En AndCode desarrollamos software a medida y aplicaciones internas que digitalizan exactamente lo que tu empresa necesita: desde portales de clientes hasta sistemas de gestión o paneles de control personalizados. Sin soluciones genéricas que no encajan.",
+              "type": "string"
+            },
+            {
+              "id": "a-cta",
+              "name": "cta",
+              "value": "¿Te interesa ver en 15 minutos cómo podríamos digitalizar uno de tus procesos clave? Me gustaría mostrarte ejemplos reales de proyectos similares.",
+              "type": "string"
+            },
+            {
+              "id": "a-label",
+              "name": "servicio_label",
+              "value": "Software a Medida",
+              "type": "string"
+            },
+            {
+              "id": "a-tag",
+              "name": "hubspot_servicio",
+              "value": "APP",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-set-app",
+      "name": "📱 Variables App",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "au-asunto",
+              "name": "asunto_email",
+              "value": "={{ '¿Qué pasaría si ' + $json.nombre_empresa + ' automatizara sus tareas repetitivas?' }}",
+              "type": "string"
+            },
+            {
+              "id": "au-problema",
+              "name": "problema",
+              "value": "={{ 'Cada semana, equipos como el de ' + $json.nombre_empresa + ' dedican horas a tareas repetitivas: enviar emails manualmente, copiar datos entre sistemas, generar informes... Tiempo que podría invertirse en trabajo estratégico de mayor valor.' }}",
+              "type": "string"
+            },
+            {
+              "id": "au-propuesta",
+              "name": "propuesta",
+              "value": "En AndCode implementamos automatizaciones con IA que conectan todas tus herramientas (CRM, ERP, email, WhatsApp) y eliminan el trabajo manual. Nuestros clientes ahorran de media entre 15 y 20 horas semanales por empleado.",
+              "type": "string"
+            },
+            {
+              "id": "au-cta",
+              "name": "cta",
+              "value": "={{ '¿Hablamos 15 minutos esta semana sobre qué procesos de ' + $json.nombre_empresa + ' podríamos automatizar? Seguro que encontramos quick-wins con impacto inmediato.' }}",
+              "type": "string"
+            },
+            {
+              "id": "au-label",
+              "name": "servicio_label",
+              "value": "Automatización e IA",
+              "type": "string"
+            },
+            {
+              "id": "au-tag",
+              "name": "hubspot_servicio",
+              "value": "AUTOMATIZACION",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-set-auto",
+      "name": "🤖 Variables Automatización",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [780, 520]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email_contacto }}",
+        "subject": "={{ $json.asunto_email }}",
+        "emailType": "html",
+        "message": "=<html lang='es'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1.0'></head><body style='margin:0;padding:20px;background:#f4f6f9;font-family:Arial,sans-serif;'><div style='max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.10);'><div style='background:linear-gradient(135deg,#1a73e8,#0d47a1);padding:28px 36px;'><h1 style='margin:0;color:#ffffff;font-size:21px;font-weight:700;'>AndCode</h1><p style='margin:5px 0 0;color:rgba(255,255,255,.8);font-size:13px;'>Desarrollo Web · Aplicaciones · Automatización</p></div><div style='padding:36px;'><p style='font-size:16px;color:#2c3e50;margin:0 0 22px;'>Hola <strong>{{ $json.nombre_contacto }}</strong>,</p><div style='background:#fffbeb;border-left:4px solid #f59e0b;border-radius:6px;padding:18px;margin-bottom:22px;'><p style='margin:0;color:#555;font-size:15px;line-height:1.75;'>{{ $json.problema }}</p></div><p style='color:#444;font-size:15px;line-height:1.75;margin:0 0 22px;'>{{ $json.propuesta }}</p><div style='background:#eff6ff;border-radius:8px;padding:22px;'><p style='margin:0;color:#1d4ed8;font-size:15px;font-weight:500;line-height:1.65;'>{{ $json.cta }}</p></div></div><div style='background:#f9fafb;padding:22px 36px;border-top:1px solid #e5e7eb;'><p style='margin:0;font-size:14px;color:#6b7280;'>Un saludo,</p><p style='margin:5px 0 2px;font-size:15px;font-weight:700;color:#111827;'>Equipo AndCode</p><p style='margin:0;font-size:13px;color:#9ca3af;'>www.andcode.es</p></div></div><p style='text-align:center;font-size:11px;color:#9ca3af;margin-top:15px;'>Si no deseas recibir más comunicaciones, responde indicándolo.</p></body></html>",
+        "options": {
+          "senderName": "AndCode"
+        }
+      },
+      "id": "node-gmail",
+      "name": "📧 Enviar Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1100, 300],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CONFIGURA_TU_CREDENCIAL_GMAIL",
+          "name": "Gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "contact",
+        "operation": "create",
+        "email": "={{ $json.email_contacto }}",
+        "additionalFields": {
+          "firstName": "={{ $json.nombre_contacto.split(' ')[0] }}",
+          "lastName": "={{ $json.nombre_contacto.split(' ').slice(1).join(' ') || '-' }}",
+          "company": "={{ $json.nombre_empresa }}",
+          "phone": "={{ $json.telefono || '' }}"
+        }
+      },
+      "id": "node-hs-contact",
+      "name": "👤 Crear Contacto HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [1360, 300],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "CONFIGURA_TU_CREDENCIAL_HUBSPOT",
+          "name": "HubSpot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "deal",
+        "operation": "create",
+        "dealName": "={{ $json.servicio_label + ' — ' + $json.nombre_empresa }}",
+        "additionalFields": {
+          "dealStage": "appointmentscheduled",
+          "closeDate": "={{ new Date(Date.now() + 30*24*60*60*1000).toISOString().split('T')[0] }}"
+        }
+      },
+      "id": "node-hs-deal",
+      "name": "💼 Crear Trato HubSpot",
+      "type": "n8n-nodes-base.hubspot",
+      "typeVersion": 2.1,
+      "position": [1620, 300],
+      "credentials": {
+        "hubspotAppToken": {
+          "id": "CONFIGURA_TU_CREDENCIAL_HUBSPOT",
+          "name": "HubSpot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REEMPLAZA_CON_TU_SHEETS_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Leads",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email_enviado": "SI",
+            "fecha_envio": "={{ new Date().toISOString().split('T')[0] }}"
+          },
+          "matchingColumns": ["email_contacto"],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "node-gs-update",
+      "name": "✅ Marcar Procesado",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.2,
+      "position": [1880, 300],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CONFIGURA_TU_CREDENCIAL_GOOGLE",
+          "name": "Google Sheets"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "🕐 Ejecutar Manualmente": {
+      "main": [
+        [{ "node": "📋 Leer Leads", "type": "main", "index": 0 }]
+      ]
+    },
+    "📋 Leer Leads": {
+      "main": [
+        [{ "node": "🔎 Filtrar No Procesados", "type": "main", "index": 0 }]
+      ]
+    },
+    "🔎 Filtrar No Procesados": {
+      "main": [
+        [{ "node": "🔀 Switch Servicio", "type": "main", "index": 0 }],
+        []
+      ]
+    },
+    "🔀 Switch Servicio": {
+      "main": [
+        [{ "node": "🌐 Variables Web", "type": "main", "index": 0 }],
+        [{ "node": "📱 Variables App", "type": "main", "index": 0 }],
+        [{ "node": "🤖 Variables Automatización", "type": "main", "index": 0 }]
+      ]
+    },
+    "🌐 Variables Web": {
+      "main": [
+        [{ "node": "📧 Enviar Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "📱 Variables App": {
+      "main": [
+        [{ "node": "📧 Enviar Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "🤖 Variables Automatización": {
+      "main": [
+        [{ "node": "📧 Enviar Email", "type": "main", "index": 0 }]
+      ]
+    },
+    "📧 Enviar Email": {
+      "main": [
+        [{ "node": "👤 Crear Contacto HubSpot", "type": "main", "index": 0 }]
+      ]
+    },
+    "👤 Crear Contacto HubSpot": {
+      "main": [
+        [{ "node": "💼 Crear Trato HubSpot", "type": "main", "index": 0 }]
+      ]
+    },
+    "💼 Crear Trato HubSpot": {
+      "main": [
+        [{ "node": "✅ Marcar Procesado", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "instanceId": "local"
+  },
+  "tags": [
+    { "name": "andcode", "id": "2" },
+    { "name": "outreach", "id": "3" }
+  ]
+}

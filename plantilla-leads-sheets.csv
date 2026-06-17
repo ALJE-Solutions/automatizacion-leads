@@ -1,0 +1,6 @@
+nombre_empresa,nombre_contacto,email_contacto,cargo,telefono,sector,ciudad,servicio_objetivo,fuente,notas,email_enviado,fecha_envio
+Fontanería García SL,Pedro García,pedro@fontaneria-garcia.es,Gerente,+34 600 111 222,Fontanería,Madrid,web,Búsqueda web,,NO,
+Clínica Dental Ruiz,Laura Ruiz,info@clinica-ruiz.es,Directora,+34 611 333 444,Salud,Barcelona,web,LinkedIn,,NO,
+Talleres Mecánicos Torres,José Torres,talleres.torres@gmail.com,Propietario,+34 622 555 666,Automoción,Sevilla,app,Referido,,NO,
+Gestoría López e Hijos,Ana López,ana@gestoria-lopez.es,Socia,+34 633 777 888,Asesoría,Valencia,automatizacion,Búsqueda web,,NO,
+Carpintería Artesanal Vega,Miguel Vega,mvega@carpinteria.es,CEO,+34 644 999 000,Carpintería,Bilbao,web,Google Maps,,NO,

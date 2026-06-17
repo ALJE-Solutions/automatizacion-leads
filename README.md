@@ -1,34 +1,51 @@
-# 🚀 Automatización de Captación de Leads — Negocios Sin Web
+# 🚀 Sistema de Captación y Outreach — AndCode
 
 <div align="center">
 
 ![n8n](https://img.shields.io/badge/n8n-v2.14.2-orange?style=for-the-badge&logo=n8n)
 ![SerpApi](https://img.shields.io/badge/SerpApi-Google_Maps-blue?style=for-the-badge)
+![HubSpot](https://img.shields.io/badge/HubSpot-CRM_Free-orange?style=for-the-badge&logo=hubspot)
 ![Estado](https://img.shields.io/badge/Estado-✅_Funcional-brightgreen?style=for-the-badge)
 
-**Sistema automatizado para encontrar negocios locales que NO tienen página web.**  
-Ideal para ofrecerles servicios de diseño web, marketing digital o presencia online.
+**Pipeline completo de captación de leads para AndCode:**  
+Encuentra negocios locales sin web → los enriquece → les envía un email personalizado → los registra en HubSpot CRM.
 
 </div>
 
 ---
 
+## 🗺️ Los dos workflows del sistema
+
+Este repositorio contiene **dos workflows complementarios** que forman un pipeline end-to-end:
+
+| # | Workflow | Archivo | Qué hace |
+|---|----------|---------|----------|
+| 1️⃣ | **Captación de Leads** | `workflow-leads-MANUAL-public.json` | Busca negocios sin web en Google Maps y los guarda en CSV |
+| 2️⃣ | **Outreach Multi-Servicio** | `workflow-andcode-outreach.json` | Lee leads de Google Sheets, envía emails personalizados por servicio y registra en HubSpot |
+
+```
+[Workflow 1] Buscar negocios sin web → leads.csv
+                    ↓ (exporta manualmente a Google Sheets)
+[Workflow 2] Google Sheets → Email personalizado → HubSpot CRM
+```
+
+---
+
 ## 📋 Índice
 
-- [¿Qué hace este sistema?](#-qué-hace-este-sistema)
+- [Workflow 1: Captación de Leads](#workflow-1-captación-de-leads)
+- [Workflow 2: Outreach Multi-Servicio](#workflow-2-outreach-multi-servicio)
 - [Requisitos previos](#-requisitos-previos)
 - [Instalación paso a paso](#-instalación-paso-a-paso)
-- [Configuración del workflow](#-configuración-del-workflow)
-- [Cómo usarlo](#-cómo-usarlo)
 - [Estructura del proyecto](#-estructura-del-proyecto)
-- [Datos que se obtienen](#-datos-que-se-obtienen)
-- [Ejemplo de resultados](#-ejemplo-de-resultados)
-- [Arquitectura del workflow](#-arquitectura-del-workflow)
 - [Solución de problemas](#-solución-de-problemas)
-- [Limitaciones](#-limitaciones)
 - [Contribuir](#-contribuir)
 
 ---
+
+## Workflow 1: Captación de Leads
+
+> 📄 Archivo: `workflow-leads-MANUAL-public.json`
 
 ## 🎯 ¿Qué hace este sistema?
 
@@ -155,10 +172,18 @@ Abre tu navegador en: **http://localhost:5678**
 
 ```
 automatizacion-leads/
-├── 📄 README.md                    ← Este manual
-├── 🔧 workflow-leads-MANUAL.json   ← Workflow principal (IMPORTAR ESTE)
-├── 📊 leads.csv                    ← Resultados (se genera automáticamente)
-└── 📜 instrucciones.xml            ← Especificaciones originales
+│
+├── 📄 README.md                          ← Este manual
+│
+├── ── WORKFLOW 1: Captación ──
+├── 🔧 workflow-leads-MANUAL-public.json  ← Busca negocios sin web en Google Maps
+│
+├── ── WORKFLOW 2: Outreach ──
+├── � workflow-andcode-outreach.json     ← Envía emails y registra en HubSpot
+├── 📖 guia-andcode-outreach.md           ← Guía paso a paso del Workflow 2
+├── 📊 plantilla-leads-sheets.csv         ← Plantilla para el Google Sheets
+│
+└── 📜 instrucciones.xml                  ← Especificaciones originales
 ```
 
 ---
@@ -242,6 +267,70 @@ Búsqueda: **"Peluquería" en "Sanlúcar de Barrameda"**
 
 ---
 
+## Workflow 2: Outreach Multi-Servicio
+
+> 📄 Archivo: `workflow-andcode-outreach.json` · 📖 Guía detallada: [`guia-andcode-outreach.md`](guia-andcode-outreach.md)
+
+Toma los leads captados (o cualquier lista de prospectos en Google Sheets) y les envía un email **completamente personalizado según el servicio que necesitan**, registrándolos automáticamente en HubSpot CRM.
+
+### Flujo del Workflow 2
+
+```
+📋 Google Sheets (leads con columna servicio_objetivo)
+         ↓
+🔎 Filtra leads ya contactados
+         ↓
+🔀 Switch por servicio_objetivo
+    ↙          ↓          ↘
+🌐 Web     📱 App     🤖 Auto
+    ↘          ↓          ↙
+    Variables personalizadas (asunto, problema, propuesta, CTA)
+         ↓
+📧 Email HTML personalizado (Gmail)
+         ↓
+👤 Crear contacto en HubSpot CRM
+         ↓
+💼 Crear trato con etiqueta de servicio
+         ↓
+✅ Marcar como procesado en Google Sheets
+```
+
+### Nodos del Workflow 2
+
+| # | Nodo | Función |
+|---|------|---------|
+| 1 | 🕐 Ejecutar Manualmente | Trigger manual |
+| 2 | 📋 Leer Leads | Lee todas las filas de Google Sheets |
+| 3 | 🔎 Filtrar No Procesados | Omite filas con `email_enviado = SI` |
+| 4 | 🔀 Switch Servicio | Divide el flujo: `web` / `app` / `automatizacion` |
+| 5 | 🌐 Variables Web | Genera contenido para leads de Desarrollo Web |
+| 6 | 📱 Variables App | Genera contenido para leads de Software a Medida |
+| 7 | 🤖 Variables Automatización | Genera contenido para leads de Automatización e IA |
+| 8 | 📧 Enviar Email | Email HTML con diseño profesional y contenido dinámico |
+| 9 | 👤 Crear Contacto HubSpot | Registra el prospecto en el CRM |
+| 10 | 💼 Crear Trato HubSpot | Deal con etiqueta WEB / APP / AUTOMATIZACION |
+| 11 | ✅ Marcar Procesado | Escribe `SI` y la fecha en el Sheet |
+
+### Expresiones dinámicas clave
+
+```javascript
+// Asunto del email — se adapta según el servicio
+// Web:
+"¿Tu web está perdiendo clientes sin que lo sepas, {{ nombre_contacto }}?"
+// App:
+"¿Cuántas horas pierde {{ nombre_empresa }} al mes en procesos manuales?"
+// Auto:
+"¿Qué pasaría si {{ nombre_empresa }} automatizara sus tareas repetitivas?"
+
+// Nombre del trato en HubSpot
+{{ $json.servicio_label + ' — ' + $json.nombre_empresa }}
+// Ejemplo: "Desarrollo Web — Fontanería García SL"
+```
+
+**→ [Ver guía completa de configuración del Workflow 2](guia-andcode-outreach.md)**
+
+---
+
 ## 🔧 Solución de problemas
 
 ### ❌ El puerto 5678 está ocupado
@@ -298,12 +387,12 @@ chmod 666 /ruta/a/tu/leads.csv
 
 ## 💡 Ideas de mejora
 
-- [ ] Enviar leads por email automáticamente
-- [ ] Guardar en Google Sheets (requiere configurar OAuth)
-- [ ] Añadir búsqueda paginada (más de 20 resultados)
-- [ ] Integrar con un CRM
-- [ ] Añadir deduplicación de leads
-- [ ] Programar ejecuciones automáticas (Cron)
+- [ ] Conectar Workflow 1 con Workflow 2 automáticamente (pipeline end-to-end)
+- [ ] Añadir un nodo Wait entre leads para evitar filtros anti-spam
+- [ ] Programar ejecución automática con Schedule Trigger (ej: lunes 9:00)
+- [ ] Añadir seguimiento: reenviar si no hay respuesta en 5 días
+- [ ] Búsqueda paginada en Google Maps (más de 20 resultados)
+- [ ] Deduplicación de leads entre ejecuciones
 
 ---
 

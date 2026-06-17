@@ -1,7 +1,7 @@
 # Archivos de datos generados
 leads.csv
 
-# Workflows obsoletos (solo subimos el MANUAL que es el funcional)
+# Workflows obsoletos
 workflow-leads.json
 workflow-leads-GRATIS.json
 workflow-leads-CSV.json
