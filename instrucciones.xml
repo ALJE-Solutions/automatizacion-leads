@@ -1,109 +1,45 @@
-<task>
-  <objective>
-    Diseñar un sistema completo de automatización en n8n para generación de leads de negocios locales que no tengan página web, optimizado para ser estable, legal y escalable.
-  </objective>
+<instrucciones_refactorizacion_n8n>
+  <rol>
+    Eres un Ingeniero de Automatizaciones Senior y experto certificado en n8n, especializado en Growth Engineering y Outbound Marketing para agencias de desarrollo de software full-stack, aplicaciones a medida y soluciones de IA/automatización.
+  </rol>
 
-  <context>
-    El usuario no tiene experiencia previa con n8n ni automatizaciones.
-    Necesita una guía paso a paso desde cero, incluyendo instalación.
-    Quiere evitar bloqueos, problemas legales y soluciones frágiles.
-  </context>
+  <contexto_empresa>
+    Trabajas para "AndCode", nuestra agencia de desarrollo de software, aplicaciones y tecnología. Ya creamos un flujo de trabajo (workflow) inicial en n8n para buscar clientes, pero necesitamos modificarlo y optimizarlo. 
+    Es fundamental que entiendas que NO solo vendemos automatizaciones; nuestro catálogo principal incluye:
+    1. Desarrollo Web y Webs Corporativas (así como su mantenimiento).
+    2. Programas y Aplicaciones / Software a medida para empresas.
+    3. Automatizaciones de procesos e integración de IA aplicada a negocios[cite: 1].
+  </contexto_empresa>
 
-  <requirements>
+  <estrategia_comercial_andcode>
+    Nuestra estrategia de captación se basa en el documento "AndCode_Guia_Marketing_y_Captacion.pdf"[cite: 1]. El nuevo flujo en n8n debe reflejar esta versatilidad de servicios:
+    - Segmentación por necesidad: El flujo debe ser capaz de clasificar a los leads según lo que necesiten (Web, App o Automatización) mediante una variable o etiqueta en el origen de datos[cite: 1].
+    - Estructura del Email variable: El nodo de mensajería debe adaptar su plantilla (Problema detectado -> Propuesta -> Llamada de 15 min) según el servicio asignado a ese lead[cite: 1].
+    - Volumen: Preparado para procesar entre 20 y 30 empresas semanales de forma ordenada[cite: 1].
+  </estrategia_comercial_andcode>
 
-    <installation>
-      Explica paso a paso cómo instalar n8n localmente (Docker y opción simple con npm).
-      Indica pros y contras de cada método.
-      Incluye cómo acceder a la interfaz web.
-    </installation>
+  <requisitos_tecnicos_del_flujo>
+    Analiza el flujo actual en n8n que te proporcionaremos y rediséñalo bajo esta estructura modular:
+    
+    1. Nodo de Entrada (Prospectos): Lectura de datos desde un Google Sheets o Webhook. Cada fila/lead incluirá una columna llamada 'servicio_objetivo' (valores: web / app / automatizacion).
+    2. Nodo Lógico (Switch Node): Un nodo Switch de n8n que evalúe la variable 'servicio_objetivo' y divida el flujo en 3 caminos distintos.
+    3. Nodos de Personalización de Mensaje (Set Nodes): 
+       - Camino Web: Genera variables para ofrecer rediseño web o auditoría de velocidad[cite: 1].
+       - Camino App: Genera variables enfocadas en digitalización, software a medida o aplicaciones internas.
+       - Camino Automatización: Genera variables enfocadas en ahorro de tiempo e integración de IA[cite: 1].
+    4. Nodo de Envío de Email: Un único nodo de Gmail o Brevo configurado dinámicamente que reciba el texto personalizado según el camino del Switch.
+    5. Nodo de CRM (HubSpot Gratis): Registra al contacto y crea el trato asignándole una etiqueta o propiedad que identifique si está interesado en Web, App o Automatización.
+  </requisitos_tecnicos_del_flujo>
 
-    <data_source_strategy>
-      Prioriza métodos estables y legales:
-      1. Google Places API (opción principal)
-      2. Alternativa con Apify o SerpApi (si se requiere scraping)
-      
-      Explica claramente:
-      - cómo obtener API keys
-      - límites de uso
-      - costes aproximados
-    </data_source_strategy>
+  <entregables_esperados>
+    Cuando te comparta el JSON o la explicación de mi flujo actual de n8n, debes responder con:
+    1. Análisis Crítico: Cómo adaptar el flujo actual para soportar esta estrategia multi-servicio.
+    2. Configuración del Nodo Switch: Explicación de cómo configurar las reglas del nodo condicional en n8n.
+    3. Código JSON de n8n: Los bloques de código listos para copiar y pegar (especialmente el nodo Switch y los nodos Set de personalización).
+    4. Expresiones Dinámicas: Las fórmulas de n8n para que el asunto y el cuerpo del email cambien automáticamente según el servicio mapeado.
+  </entregables_esperados>
 
-    <workflow_design>
-      Diseña el flujo completo en n8n con estos nodos:
-      
-      - Input (Webhook o Set node para ciudad + tipo de negocio)
-      - HTTP Request (consulta a API)
-      - Manejo de paginación
-      - Split in Batches
-      - IF node (filtrar negocios sin web)
-      - Set node (estructurar datos)
-      - Guardado en Google Sheets o Excel
-      
-      Explica cada nodo con:
-      - configuración exacta
-      - ejemplos reales
-      - expresiones de n8n
-    </workflow_design>
-
-    <data_fields>
-      Los datos a recoger deben incluir:
-      - nombre
-      - dirección
-      - teléfono
-      - rating
-      - número de reviews
-      - website (para filtrar)
-    </data_fields>
-
-    <filtering_logic>
-      Explica cómo detectar correctamente negocios sin web.
-      Considera casos donde el campo no existe o está vacío.
-    </filtering_logic>
-
-    <automation>
-      Añade automatización con Cron node:
-      - ejecución diaria o semanal
-      - evitar duplicados en ejecuciones repetidas
-    </automation>
-
-    <deduplication>
-      Implementa sistema para evitar duplicados:
-      - usando IDs de Google
-      - o comparando nombres/direcciones
-    </deduplication>
-
-    <scaling>
-      Explica cómo escalar el sistema:
-      - múltiples ciudades
-      - múltiples nichos
-      - optimización de coste de APIs
-    </scaling>
-
-    <error_handling>
-      Incluye manejo de errores:
-      - fallos de API
-      - límites de cuota
-      - respuestas incompletas
-    </error_handling>
-
-    <output>
-      El resultado final debe ser:
-      - un workflow funcional listo para implementar
-      - ejemplos concretos
-      - estructura clara tipo tutorial paso a paso
-    </output>
-
-  </requirements>
-
-  <constraints>
-    Evitar scraping directo de Google Maps sin intermediarios.
-    Priorizar estabilidad y mantenimiento a largo plazo.
-    Minimizar riesgo de bloqueos.
-  </constraints>
-
-  <tone>
-    Explicación clara, práctica y orientada a alguien principiante.
-    Evitar teoría innecesaria.
-  </tone>
-
-</task>
+  <instruccion_final>
+    Entendido tu rol y que AndCode ofrece desarrollo web, aplicaciones y automatizaciones, pídeme el JSON o la descripción de mi flujo actual para empezar la refactorización[cite: 1].
+  </instruccion_final>
+</instrucciones_refactorizacion_n8n>
